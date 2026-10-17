@@ -186,7 +186,6 @@
   (is (= {:items [{:key model/empty-key :text model/empty-message}] :active-id nil}
          (model/shown-panel fruits "zzz" 0 {:value #{} :max nil}))))
 
-
 ;; ── value formats ────────────────────────────────────────────────────────
 (def ^:private charity "Liefdadigheid, religieus en non-profit")
 
@@ -250,9 +249,9 @@
     (is (= [charity " padded" "tail "]
            (model/csv-unrepresentable ["apple" charity " padded" "tail "]))))
   (testing "the message names the values and the json format"
-    (let [msg (model/unrepresentable-message [charity])]
-      (is (not= -1 (.indexOf msg charity)))
-      (is (not= -1 (.indexOf msg "value-format=\"json\""))))))
+    (is (= (str "Stored [\"a, b\"] as a comma-separated value, which splits or trims it."
+                " Set value-format=\"json\".")
+           (model/unrepresentable-message ["a, b"])))))
 
 (deftest normalize-value-format-model-test
   (testing "defaults to csv with a valid value"
