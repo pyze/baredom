@@ -94,6 +94,9 @@ While the panel is closed, this month follows each change of these attributes. W
 is open, a change does not move the month, so a pick or a write does not undo the month
 navigation. The next open shows the month of the date that is then committed.
 
+Today is the local date of the user, from the local date fields of the clock. It is not the UTC
+date, so near midnight the calendar still opens on the day the user sees.
+
 ---
 
 ## Slots

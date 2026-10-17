@@ -11,6 +11,11 @@ All notable changes to BareDOM will be documented in this file.
   which is today when a framework makes the element and then sets its attributes. While the
   panel is closed, the month follows the value, else the start, else the end, else today. While
   the panel is open, a new value does not move the month, and the month navigation holds.
+- **`x-date-picker` and `x-calendar` take today from the local date of the user,** not from the
+  UTC date. Before, late in the evening in a time zone behind UTC, today was tomorrow: the
+  calendar opened on the wrong day, and on the last day of a month on the next month. Early in
+  the morning in a time zone ahead of UTC, today was yesterday. This changes the default month,
+  the focused day and the `x-calendar` today marker. Stored ISO dates do not change.
 
 ## [4.8.0] - 2026-10-17
 
