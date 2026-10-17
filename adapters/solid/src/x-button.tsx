@@ -10,6 +10,7 @@ export interface XButtonProps {
   disabled?: boolean;
   loading?: boolean;
   pressed?: boolean;
+  toggle?: boolean;
   type?: string;
   variant?: string;
   size?: string;

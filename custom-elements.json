@@ -1092,6 +1092,12 @@
         }
       }, {
         "kind" : "field",
+        "name" : "toggle",
+        "type" : {
+          "text" : "boolean"
+        }
+      }, {
+        "kind" : "field",
         "name" : "type",
         "type" : {
           "text" : "string"
@@ -1130,6 +1136,12 @@
       }, {
         "name" : "pressed",
         "fieldName" : "pressed",
+        "type" : {
+          "text" : "boolean"
+        }
+      }, {
+        "name" : "toggle",
+        "fieldName" : "toggle",
         "type" : {
           "text" : "boolean"
         }

@@ -20,6 +20,7 @@ export class BaredomButton implements OnInit, OnDestroy {
   @Input() set disabled(v: boolean) { this.el.disabled = v as any; }
   @Input() set loading(v: boolean) { this.el.loading = v as any; }
   @Input() set pressed(v: boolean) { this.el.pressed = v as any; }
+  @Input() set toggle(v: boolean) { this.el.toggle = v as any; }
   @Input() set type(v: string) { this.el.type = v as any; }
   @Input() set variant(v: string) { this.el.variant = v as any; }
   @Input() set size(v: string) { this.el.size = v as any; }

@@ -8,6 +8,7 @@
     disabled?: boolean;
     loading?: boolean;
     pressed?: boolean;
+    toggle?: boolean;
     type?: string;
     variant?: string;
     size?: string;
@@ -31,6 +32,7 @@
     disabled,
     loading,
     pressed,
+    toggle,
     type,
     variant,
     size,
@@ -79,6 +81,7 @@
   {disabled}
   {loading}
   {pressed}
+  {toggle}
   {type}
   {variant}
   {size}

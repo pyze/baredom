@@ -446,6 +446,7 @@
    {:disabled (forms/disabled? el)
     :loading  (du/has-attr? el model/attr-loading)
     :pressed  (du/has-attr? el model/attr-pressed)
+    :toggle   (du/has-attr? el model/attr-toggle)
     :type     (du/get-attr el model/attr-type)
     :variant  (du/get-attr el model/attr-variant)
     :size     (du/get-attr el model/attr-size)
@@ -500,7 +501,7 @@
 
 (defn- apply-button-aria! [^js button-el public-state aria-label-value]
   (toggle-attr! button-el attr-aria-busy    (model/aria-busy public-state))
-  (toggle-attr! button-el attr-aria-pressed (when (:pressed public-state) val-true))
+  (toggle-attr! button-el attr-aria-pressed (model/aria-pressed public-state))
   (toggle-attr! button-el attr-aria-label   aria-label-value))
 
 (defn- apply-button-data-state! [^js button-el public-state m]

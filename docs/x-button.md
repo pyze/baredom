@@ -78,7 +78,8 @@ Registration is idempotent — calling `init()` on an already-registered element
 ### Pressed / toggle button
 
 ```html
-<x-button pressed>Bold</x-button>
+<x-button toggle pressed>Bold</x-button>
+<x-button toggle>Italic</x-button>
 ```
 
 ### Icon-only button
@@ -173,7 +174,26 @@ Behavior:
 
 When absent:
 
-* `aria-pressed` is removed — the button is not treated as a toggle control
+* on a `toggle` button, sets `aria-pressed="false"`
+* on any other button, `aria-pressed` is removed: the button is not treated as a toggle control
+
+---
+
+### `toggle`
+
+Boolean attribute.
+
+When present, the button is a toggle button. Its inner `<button>` always has `aria-pressed`:
+`"true"` when `pressed` is present, `"false"` when it is absent. A screen reader then announces
+each button of a group of toggles as a toggle, also when it is not pressed.
+
+```html
+<x-button toggle pressed>Last 7 days</x-button>
+<x-button toggle>Last 30 days</x-button>
+```
+
+Set `toggle` on every button that the user switches on and off. A plain action button has no
+`toggle` and no `aria-pressed`.
 
 ---
 
@@ -287,13 +307,14 @@ Behavior:
 
 ## Properties
 
-Each property reflects its attribute. The first three are booleans and have a section below.
+Each property reflects its attribute. The first four are booleans and have a section below.
 
 | Property   | Type    | Reflects   | Default     |
 |------------|---------|------------|-------------|
 | `disabled` | boolean | `disabled` | `false`     |
 | `loading`  | boolean | `loading`  | `false`     |
 | `pressed`  | boolean | `pressed`  | `false`     |
+| `toggle`   | boolean | `toggle`   | `false`     |
 | `type`     | string  | `type`     | `"button"`  |
 | `variant`  | string  | `variant`  | `"primary"` |
 | `size`     | string  | `size`     | `"md"`      |
@@ -364,6 +385,29 @@ Example:
 ```js
 const el = document.querySelector("x-button");
 el.pressed = false;
+```
+
+---
+
+### `toggle`
+
+Type:
+
+```text
+boolean
+```
+
+Reflects:
+
+```text
+toggle
+```
+
+Example:
+
+```js
+const el = document.querySelector("x-button");
+el.toggle = true;
 ```
 
 ---
@@ -593,7 +637,8 @@ When `pressed` is present:
 
 When `pressed` is absent:
 
-* `aria-pressed` is removed (the button is treated as a regular action button, not a toggle)
+* on a `toggle` button, `aria-pressed="false"` is set
+* on any other button, `aria-pressed` is removed (the button is treated as a regular action button, not a toggle)
 
 ### Accessible name rules
 
@@ -995,7 +1040,7 @@ Avoid:
 
 * native button semantics
 * accessible interaction
-* boolean reflection for `disabled`, `loading`, and `pressed`
+* boolean reflection for `disabled`, `loading`, `pressed` and `toggle`
 * normalized enums for `type`, `variant`, and `size`
 * slot-based icon and spinner composition
 * host-variable theming

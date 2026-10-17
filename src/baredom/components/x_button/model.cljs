@@ -6,6 +6,7 @@
 (def attr-disabled "disabled")
 (def attr-loading "loading")
 (def attr-pressed "pressed")
+(def attr-toggle "toggle")
 (def attr-type "type")
 (def attr-variant "variant")
 (def attr-size "size")
@@ -35,6 +36,7 @@
   #js [attr-disabled
        attr-loading
        attr-pressed
+       attr-toggle
        attr-type
        attr-variant
        attr-size
@@ -44,6 +46,7 @@
   {:disabled {:type 'boolean :reflects-attribute attr-disabled}
    :loading  {:type 'boolean :reflects-attribute attr-loading}
    :pressed  {:type 'boolean :reflects-attribute attr-pressed}
+   :toggle   {:type 'boolean :reflects-attribute attr-toggle}
    :type     {:type 'string  :reflects-attribute attr-type    :default default-type :enum allowed-types}
    :variant  {:type 'string  :reflects-attribute attr-variant :default default-variant :enum allowed-variants}
    :size     {:type 'string  :reflects-attribute attr-size    :default default-size :enum allowed-sizes}
@@ -82,10 +85,11 @@
 (defn normalize-size    [value] (normalize-by-spec :size    value))
 
 (defn public-state
-  [{:keys [disabled loading pressed type variant size label]}]
+  [{:keys [disabled loading pressed toggle type variant size label]}]
   {:disabled (boolean disabled)
    :loading  (boolean loading)
    :pressed  (boolean pressed)
+   :toggle   (boolean toggle)
    :type     (normalize-by-spec :type    type)
    :variant  (normalize-by-spec :variant variant)
    :size     (normalize-by-spec :size    size)
@@ -98,6 +102,14 @@
 (defn aria-busy
   [{:keys [loading]}]
   (when loading "true"))
+
+(defn aria-pressed
+  "The `aria-pressed` value: \"true\" when pressed, \"false\" for an unpressed toggle, else nil."
+  [{:keys [pressed toggle]}]
+  (cond
+    pressed "true"
+    toggle  "false"
+    :else   nil))
 
 (defn aria-label
   [{:keys [label has-default-text?]}]

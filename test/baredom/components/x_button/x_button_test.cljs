@@ -44,7 +44,12 @@
     (set! (.-pressed el) true)
     (is (.hasAttribute el model/attr-pressed))
     (set! (.-pressed el) false)
-    (is (not (.hasAttribute el model/attr-pressed)))))
+    (is (not (.hasAttribute el model/attr-pressed)))
+
+    (set! (.-toggle el) true)
+    (is (.hasAttribute el model/attr-toggle))
+    (set! (.-toggle el) false)
+    (is (not (.hasAttribute el model/attr-toggle)))))
 
 (deftest enum-normalization-test
   (let [el (append! (make-el))
@@ -69,6 +74,30 @@
     (is (nil? (.getAttribute btn "aria-pressed")))
     (.setAttribute el model/attr-pressed "")
     (is (= "true" (.getAttribute btn "aria-pressed")))))
+
+(deftest plain-button-unpressed-has-no-aria-pressed-test
+  (let [el (append! (make-el))
+        btn (shadow-button el)]
+    (.setAttribute el model/attr-pressed "")
+    (.removeAttribute el model/attr-pressed)
+    (is (not (.hasAttribute btn "aria-pressed")))))
+
+(deftest toggle-button-always-has-aria-pressed-test
+  (let [el (append! (make-el))
+        btn (shadow-button el)]
+    (.setAttribute el model/attr-toggle "")
+    (is (= "false" (.getAttribute btn "aria-pressed")))
+    (.setAttribute el model/attr-pressed "")
+    (is (= "true" (.getAttribute btn "aria-pressed")))
+    (.removeAttribute el model/attr-pressed)
+    (is (= "false" (.getAttribute btn "aria-pressed")))))
+
+(deftest toggle-removed-drops-aria-pressed-test
+  (let [el (append! (make-el))
+        btn (shadow-button el)]
+    (.setAttribute el model/attr-toggle "")
+    (.removeAttribute el model/attr-toggle)
+    (is (not (.hasAttribute btn "aria-pressed")))))
 
 (deftest label-fallback-test
   (let [el (append! (make-el))

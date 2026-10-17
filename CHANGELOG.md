@@ -4,6 +4,15 @@ All notable changes to BareDOM will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- **`x-button` takes a `toggle` attribute.** A `toggle` button always has `aria-pressed` on its
+  inner button: `"true"` when `pressed` is present, `"false"` when it is absent. Before, an
+  unpressed button had no `aria-pressed`, so a screen reader announced a group of toggles (for
+  example date-range presets) as plain buttons and one toggle. A button with no `toggle` does not
+  change: `aria-pressed="true"` when pressed, else no `aria-pressed`. The five adapters take the
+  new `toggle` prop.
+
 ### Fixed
 
 - **The `x-date-picker` calendar opens on the month of the selection** when `value`, `start` or

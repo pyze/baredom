@@ -38,6 +38,16 @@
   (is (= "true" (model/aria-busy {:loading true})))
   (is (= nil (model/aria-busy {:loading false}))))
 
+(deftest aria-pressed-test
+  (is (= "true"  (model/aria-pressed {:pressed true  :toggle false})))
+  (is (= "true"  (model/aria-pressed {:pressed true  :toggle true})))
+  (is (= "false" (model/aria-pressed {:pressed false :toggle true})))
+  (is (= nil     (model/aria-pressed {:pressed false :toggle false}))))
+
+(deftest public-state-toggle-test
+  (is (= true  (:toggle (model/public-state {:toggle true}))))
+  (is (= false (:toggle (model/public-state {})))))
+
 (deftest aria-label-test
   (is (= "Close"
          (model/aria-label {:label "Close" :has-default-text? false})))
