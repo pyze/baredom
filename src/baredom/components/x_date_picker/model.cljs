@@ -35,7 +35,10 @@
        "disabled" "readonly" "required" "name" "autocomplete" "error"
        "aria-label" "aria-describedby" "open"])
 
-(def default-separator " - ")
+(def default-separator " \u2013 ")
+
+;; Typed range text is also split at these, after the separator of the model.
+(def typed-separators [" \u2013 " " - "])
 
 (def property-api
   {:mode        {:type 'string  :reflects-attribute attr-mode}
@@ -81,9 +84,12 @@
       (when (not= t "") t))))
 
 (defn parse-format
-  "Returns :iso or :localized.  Default is :iso."
+  "Returns :iso, :localized or :short.  Default is :iso."
   [s]
-  (if (= s "localized") :localized :iso))
+  (case s
+    "localized" :localized
+    "short"     :short
+    :iso))
 
 (defn parse-mode
   "Returns :single or :range.  Default is :single."
@@ -106,9 +112,9 @@
   "Format a JS Date for display.  Uses Intl.DateTimeFormat when available."
   [^js d {:keys [format locale]}]
   (when d
-    (if (= format :localized)
-      (let [opts #js {:year "numeric" :month "long" :day "numeric"
-                      :timeZone "UTC"}
+    (if (contains? #{:localized :short} format)
+      (let [opts #js {:year "numeric" :month (if (= format :short) "short" "long")
+                      :day "numeric" :timeZone "UTC"}
             loc  (or locale "default")]
         (.format (js/Intl.DateTimeFormat. loc opts) d))
       (dates/date->iso d))))
@@ -125,24 +131,28 @@
         date (when s (dates/iso->date s))]
     {:ok? (some? date) :date date}))
 
+(defn- split-range
+  "The range of `s` split at its first `sep`, or nil when `s` has no `sep`."
+  [s sep]
+  (let [idx (.indexOf s sep)]
+    (when (>= idx 0)
+      (let [d1 (dates/iso->date (.trim (.substring s 0 idx)))
+            d2 (dates/iso->date (.trim (.substring s (+ idx (.-length sep)))))]
+        {:ok? (and (some? d1) (some? d2)) :start d1 :end d2}))))
+
 (defn parse-display->range
   "Try to parse a display string that may contain a separator.
+   Takes the separator of the model, an en dash or a hyphen with spaces.
    Returns {:ok? boolean :start js/Date|nil :end js/Date|nil}."
   [display {:keys [separator]}]
-  (let [sep (if (and (string? separator) (pos? (.-length separator))) separator default-separator)
-        s   (normalize-str display)]
-    (if (nil? s)
-      {:ok? false :start nil :end nil}
-      (let [idx (.indexOf s sep)]
-        (if (< idx 0)
-          ;; try as single start date
-          (let [{:keys [ok? date]} (parse-display->single s)]
-            {:ok? ok? :start date :end nil})
-          (let [s1 (.trim (.substring s 0 idx))
-                s2 (.trim (.substring s (+ idx (.-length sep))))
-                d1 (dates/iso->date s1)
-                d2 (dates/iso->date s2)]
-            {:ok? (and (some? d1) (some? d2)) :start d1 :end d2}))))))
+  (let [sep    (if (and (string? separator) (pos? (.-length separator))) separator default-separator)
+        s      (normalize-str display)
+        splits (when s (keep #(split-range s %) (distinct (cons sep typed-separators))))]
+    (cond
+      (nil? s)       {:ok? false :start nil :end nil}
+      (empty? splits) (let [{:keys [ok? date]} (parse-display->single s)]
+                        {:ok? ok? :start date :end nil})
+      :else          (or (first (filter :ok? splits)) (first splits)))))
 
 ;; ---------------------------------------------------------------------------
 ;; Model canonicalization

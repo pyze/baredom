@@ -434,7 +434,7 @@
     (let [^js inp (focus-input! el)]
       (.setAttribute el model/attr-start "2026-04-01")
       (.setAttribute el model/attr-end "2026-06-30")
-      (is (= "2026-04-01 - 2026-06-30" (.-value inp))))))
+      (is (= "2026-04-01 \u2013 2026-06-30" (.-value inp))))))
 
 (deftest blur-without-an-edit-keeps-a-new-range-test
   (let [el      (append! (make-el))
@@ -890,3 +890,26 @@
           :aria-hidden "true"
           :stroke      "currentColor"}
          (trigger-button-summary))))
+
+(deftest range-display-joins-the-dates-with-an-en-dash-test
+  (let [el (append! (make-el))]
+    (.setAttribute el "mode" "range")
+    (.setAttribute el model/attr-start "2026-07-27")
+    (.setAttribute el model/attr-end "2026-08-07")
+    (is (= "2026-07-27 \u2013 2026-08-07" (.-value (shadow-part el "[part=input]"))))))
+
+(deftest typed-range-with-an-en-dash-commits-test
+  (let [el (append! (make-el))]
+    (.setAttribute el "mode" "range")
+    (enter-with! el "2024-06-15 \u2013 2024-06-20")
+    (is (= "2024-06-15" (.getAttribute el model/attr-start)))
+    (is (= "2024-06-20" (.getAttribute el model/attr-end)))))
+
+(deftest short-format-shows-a-short-locale-range-test
+  (let [el (append! (make-el))]
+    (.setAttribute el "mode" "range")
+    (.setAttribute el model/attr-format "short")
+    (.setAttribute el model/attr-locale "en-GB")
+    (.setAttribute el model/attr-start "2026-07-27")
+    (.setAttribute el model/attr-end "2026-08-07")
+    (is (= "27 Jul 2026 \u2013 7 Aug 2026" (.-value (shadow-part el "[part=input]"))))))

@@ -23,7 +23,17 @@
 (deftest parse-format-test
   (is (= :iso        (model/parse-format nil)))
   (is (= :iso        (model/parse-format "iso")))
-  (is (= :localized  (model/parse-format "localized"))))
+  (is (= :localized  (model/parse-format "localized")))
+  (is (= :short      (model/parse-format "short"))))
+
+(deftest format-date-short-test
+  (is (= "27 Jul 2026"
+         (model/format-date (dates/iso->date "2026-07-27") {:format :short :locale "en-GB"}))))
+
+(deftest range-display-uses-an-en-dash-by-default-test
+  (is (= "2026-07-27 \u2013 2026-08-07"
+         (model/display-value (model/canonicalize {:mode "range" :start "2026-07-27" :end "2026-08-07"})
+                              {:format :iso}))))
 
 (deftest canonicalize-keeps-a-locale-only-when-it-is-a-language-tag
   (is (= "nl-NL" (:locale (model/canonicalize {:locale "nl-NL"}))))
@@ -113,6 +123,20 @@
     (let [{:keys [ok?]}
           (model/parse-display->range "" {:separator " - "})]
       (is (= false ok?)))))
+
+(deftest parse-display->range-accepts-both-dashes-test
+  (doseq [text ["2024-01-01 \u2013 2024-01-31" "2024-01-01 - 2024-01-31"]
+          sep  [nil "\u2013" "-" " to "]]
+    (testing (str (pr-str text) " with separator " (pr-str sep))
+      (let [{:keys [ok? start end]} (model/parse-display->range text {:separator sep})]
+        (is (= true ok?))
+        (is (= "2024-01-01" (some-> start dates/date->iso)))
+        (is (= "2024-01-31" (some-> end dates/date->iso)))))))
+
+(deftest parse-display->range-takes-a-custom-separator-test
+  (let [{:keys [ok? end]} (model/parse-display->range "2024-01-01 to 2024-01-31" {:separator "to"})]
+    (is (= true ok?))
+    (is (= "2024-01-31" (some-> end dates/date->iso)))))
 
 (defn- days-of
   "The shown days of June 2024 for a picker made from `raw`, with `focus-iso` as the reachable cell."

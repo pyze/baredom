@@ -22,9 +22,9 @@ A calendar date picker with single-date and date-range modes. Renders a text inp
 | `end`                  | string  | —          | Range end date in `YYYY-MM-DD` format (range mode)                   |
 | `min`                  | string  | —          | Minimum selectable date (`YYYY-MM-DD`)                               |
 | `max`                  | string  | —          | Maximum selectable date (`YYYY-MM-DD`)                               |
-| `format`               | enum    | `"iso"`    | Display format: `iso` (YYYY-MM-DD) or `localized` (via `Intl`)       |
+| `format`               | enum    | `"iso"`    | Display format: `iso` (YYYY-MM-DD), `localized` (long month) or `short` (short month), the last two via `Intl` |
 | `locale`               | string  | —          | BCP 47 locale tag for localized formatting (e.g. `"en-US"`)          |
-| `separator`            | string  | `" - "`    | String placed between start and end in range display                 |
+| `separator`            | string  | `" – "`    | String placed between start and end in range display (an en dash with spaces) |
 | `auto-swap`            | boolean | `false`    | Automatically swap start/end when end is selected before start       |
 | `range-allow-same-day` | boolean | `false`    | Allow start and end to be the same date in range mode                |
 | `close-on-select`      | boolean | `false`    | Close the calendar after a date is picked, a range is complete, or typed text is committed with `Enter` |
@@ -183,6 +183,17 @@ Like a native form control, `x-date-picker` exposes read-only `validity`, `valid
 ```html
 <x-date-picker format="localized" locale="en-US" placeholder="Pick a date"></x-date-picker>
 ```
+
+`format="short"` shows the short month. With `locale="en-GB"` a range reads
+`27 Jul 2026 – 7 Aug 2026`.
+
+### Range text
+
+A range shows its two dates with an en dash and spaces between them, for example
+`2026-07-27 – 2026-08-07`. A hyphen would read as one more hyphen of the ISO dates. Set
+`separator` to show another string. The attribute value is trimmed. Typed range text is split at
+the `separator`, at an en dash with spaces, or at a hyphen with spaces, so
+`2026-07-27 - 2026-08-07` is still accepted.
 
 ### Disabled
 

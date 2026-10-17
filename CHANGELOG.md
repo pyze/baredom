@@ -12,6 +12,8 @@ All notable changes to BareDOM will be documented in this file.
   example date-range presets) as plain buttons and one toggle. A button with no `toggle` does not
   change: `aria-pressed="true"` when pressed, else no `aria-pressed`. The five adapters take the
   new `toggle` prop.
+- **`x-date-picker` takes `format="short"`**, which shows each date with the short month of the
+  locale, for example `27 Jul 2026` for `en-GB`.
 
 ### Fixed
 
@@ -29,6 +31,10 @@ All notable changes to BareDOM will be documented in this file.
   The emoji rendered as a colour picture on each platform (on macOS a page that shows "JUL 17")
   and ignored the theme colours. The icon is drawn in `currentColor`, scales with
   `--x-font-size-sm`, and is `aria-hidden`. The button label stays "Open calendar".
+- **The `x-date-picker` range text joins the two dates with an en dash** and spaces:
+  `2026-07-27 – 2026-08-07`. Before, the default `separator` was a hyphen, which read as one
+  more hyphen of the ISO dates. A set `separator` does not change. Typed range text with a hyphen
+  and spaces is still accepted.
 
 ## [4.8.0] - 2026-10-17
 
