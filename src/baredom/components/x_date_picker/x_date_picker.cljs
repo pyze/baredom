@@ -50,12 +50,10 @@
                      (du/get-attr el model/attr-range-allow-same))})
         cfg       {:format (:format canon) :locale (:locale canon)}
         disp      (model/display-value canon cfg)
-        ;; stored month: default to value-d / start-d / today
         existing  (du/getv el k-state)
         cur-month (when existing (gobj/get existing "month"))
-        anchor    (or (:value-d canon) (:start-d canon)
-                      (js/Date. (js/Date.now)))
-        month     (or cur-month (dates/start-of-month anchor))
+        month     (model/shown-month canon (js/Date. (js/Date.now))
+                                     (du/has-attr? el "open") cur-month)
         state     #js {:canon  canon
                        :cfg    cfg
                        :disp   disp
@@ -477,8 +475,7 @@
     ;; attributeChangedCallback already triggers render; set grid focus
     (let [state  (du/getv el k-state)
           canon  (when state (gobj/get state "canon"))
-          anchor (or (:value-d canon) (:start-d canon) (js/Date. (js/Date.now)))
-          iso    (dates/date->iso anchor)]
+          iso    (dates/date->iso (model/month-anchor canon (js/Date. (js/Date.now))))]
       (focus-grid-date! el iso))))
 
 (defn- close-popover!

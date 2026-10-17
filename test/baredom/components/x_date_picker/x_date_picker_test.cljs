@@ -718,3 +718,118 @@
                  (filter (fn [^js day] (= "true" (.getAttribute day "data-selected")))
                          (day-nodes el)))))))
 
+
+;; ---------------------------------------------------------------------------
+;; The month the panel shows when it opens
+;; ---------------------------------------------------------------------------
+
+(defn- shown-month
+  "The year and month of the open grid, as `YYYY-MM`."
+  [^js el]
+  (let [^js day (.querySelector (shadow-part el "[part=grid]")
+                                "[part=day][data-outside=\"false\"]")]
+    (subs (.getAttribute day "data-iso") 0 7)))
+
+(defn- focus-cell-iso
+  "The date of the day cell that Tab reaches."
+  [^js el]
+  (some-> (.querySelector (shadow-part el "[part=grid]") "[tabindex=\"0\"]")
+          (.getAttribute "data-iso")))
+
+(defn- today-month []
+  (subs (dates/date->iso (js/Date. (js/Date.now))) 0 7))
+
+(defn- open-with-btn! [^js el]
+  (.click (shadow-part el "[part=btn]"))
+  el)
+
+(defn- close-with-btn! [^js el]
+  (.click (shadow-part el "[part=btn]"))
+  el)
+
+(deftest a-start-set-after-connect-opens-on-its-month-test
+  (let [el (append! (make-el))]
+    (.setAttribute el "mode" "range")
+    (.setAttribute el "start" "2026-01-01")
+    (.setAttribute el "end" "2026-01-31")
+    (open-with-btn! el)
+    (is (= "2026-01" (shown-month el)))))
+
+(deftest a-start-set-after-create-opens-on-its-month-test
+  (let [el (make-el)]
+    (.setAttribute el "mode" "range")
+    (.setAttribute el "start" "2026-01-01")
+    (.setAttribute el "end" "2026-01-31")
+    (append! el)
+    (open-with-btn! el)
+    (is (= "2026-01" (shown-month el)))))
+
+(deftest a-new-start-while-closed-moves-the-next-open-test
+  (let [el (append! (doto (make-el)
+                      (.setAttribute "mode" "range")
+                      (.setAttribute "start" "2026-01-01")
+                      (.setAttribute "end" "2026-01-31")))]
+    (open-with-btn! el)
+    (close-with-btn! el)
+    (.setAttribute el "start" "2025-05-01")
+    (.setAttribute el "end" "2025-05-31")
+    (open-with-btn! el)
+    (is (= "2025-05" (shown-month el)))))
+
+(deftest a-new-start-while-open-keeps-the-month-test
+  (let [el (append! (doto (make-el)
+                      (.setAttribute "mode" "range")
+                      (.setAttribute "start" "2026-01-01")
+                      (.setAttribute "end" "2026-01-31")))]
+    (open-with-btn! el)
+    (.setAttribute el "start" "2025-05-01")
+    (.setAttribute el "end" "2025-05-31")
+    (is (= "2026-01" (shown-month el)))))
+
+(deftest month-navigation-holds-while-open-test
+  (let [el (append! (doto (make-el)
+                      (.setAttribute "mode" "range")
+                      (.setAttribute "start" "2026-01-01")
+                      (.setAttribute "end" "2026-01-31")))]
+    (open-with-btn! el)
+    (.click (shadow-part el "[part=navbtn][data-nav=next]"))
+    (is (= "2026-02" (shown-month el)) "next shows the next month")
+    (.click (day-of el "2026-02-10"))
+    (is (= "2026-02-10" (.getAttribute el "start")) "the click starts a new range")
+    (.click (shadow-part el "[part=navbtn][data-nav=next]"))
+    (.click (day-of el "2026-03-05"))
+    (is (= "2026-03-05" (.getAttribute el "end")) "the second click ends the range")
+    (is (= "2026-03" (shown-month el)) "the end pick keeps the navigated month")))
+
+(deftest a-reopen-shows-the-month-of-the-start-test
+  (let [el (append! (doto (make-el)
+                      (.setAttribute "mode" "range")
+                      (.setAttribute "start" "2026-01-01")
+                      (.setAttribute "end" "2026-01-31")))]
+    (open-with-btn! el)
+    (.click (shadow-part el "[part=navbtn][data-nav=next]"))
+    (close-with-btn! el)
+    (open-with-btn! el)
+    (is (= "2026-01" (shown-month el)))))
+
+(deftest a-value-set-after-connect-opens-on-its-month-test
+  (let [el (append! (make-el))]
+    (.setAttribute el "value" "2025-03-14")
+    (open-with-btn! el)
+    (is (= "2025-03" (shown-month el)))
+    (is (= "2025-03-14" (focus-cell-iso el)) "the value has the focus")))
+
+(deftest an-end-alone-opens-on-its-month-test
+  (let [el (append! (doto (make-el) (.setAttribute "mode" "range")))]
+    (.setAttribute el "end" "2025-08-20")
+    (open-with-btn! el)
+    (is (= "2025-08" (shown-month el)))
+    (is (= "2025-08-20" (focus-cell-iso el)) "the end has the focus")))
+
+(deftest a-cleared-value-opens-on-the-month-of-today-test
+  (let [el (append! (doto (make-el) (.setAttribute "value" "2020-02-14")))]
+    (open-with-btn! el)
+    (close-with-btn! el)
+    (.removeAttribute el "value")
+    (open-with-btn! el)
+    (is (= (today-month) (shown-month el)))))

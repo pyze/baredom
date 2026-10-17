@@ -2,6 +2,16 @@
 
 All notable changes to BareDOM will be documented in this file.
 
+## [Unreleased]
+
+### Fixed
+
+- **The `x-date-picker` calendar opens on the month of the selection** when `value`, `start` or
+  `end` is set after the element is made. Before, it opened on the month of the first render,
+  which is today when a framework makes the element and then sets its attributes. While the
+  panel is closed, the month follows the value, else the start, else the end, else today. While
+  the panel is open, a new value does not move the month, and the month navigation holds.
+
 ## [4.8.0] - 2026-10-17
 
 BareDOM 4.8 lets `x-multi-combobox` take values that hold a comma, and fixes two `x-date-picker`

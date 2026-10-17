@@ -85,6 +85,15 @@ Deleting the text and committing (blur, `Enter`, or `commit()`) clears the commi
 
 Committing a blank input when nothing is committed yet is a no-op: neither event fires.
 
+### The month the calendar shows
+
+The calendar opens on the month of `value` in single mode. In range mode it opens on the month
+of `start`, or of `end` when there is no `start`. With no date it opens on the month of today.
+
+While the panel is closed, this month follows each change of these attributes. While the panel
+is open, a change does not move the month, so a pick or a write does not undo the month
+navigation. The next open shows the month of the date that is then committed.
+
 ---
 
 ## Slots

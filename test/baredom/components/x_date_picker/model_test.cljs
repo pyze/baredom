@@ -152,3 +152,29 @@
   (is (not-any? (comp #{"0"} :tabindex) (days-of {} "2024-09-01"))
       "no cell when the focus is in another month"))
 
+
+(defn- d [iso] (dates/iso->date iso))
+
+(deftest month-anchor-takes-the-first-date-the-model-holds-test
+  (let [today (d "2026-10-17")]
+    (is (= "2025-03-14" (dates/date->iso (model/month-anchor {:value-d (d "2025-03-14")} today))))
+    (is (= "2025-05-02" (dates/date->iso (model/month-anchor {:start-d (d "2025-05-02")
+                                                               :end-d   (d "2025-06-30")} today))))
+    (is (= "2025-06-30" (dates/date->iso (model/month-anchor {:end-d (d "2025-06-30")} today)))
+        "an end alone is the anchor")
+    (is (= "2026-10-17" (dates/date->iso (model/month-anchor {} today)))
+        "no date gives today")))
+
+(deftest shown-month-follows-the-model-while-closed-test
+  (let [today (d "2026-10-17")
+        canon {:start-d (d "2026-01-01") :end-d (d "2026-01-31")}]
+    (is (= "2026-01-01" (dates/date->iso (model/shown-month canon today false (d "2026-10-01"))))
+        "a closed panel drops the stored month")
+    (is (= "2026-01-01" (dates/date->iso (model/shown-month canon today true nil)))
+        "an open panel with no stored month uses the anchor")
+    (is (= "2026-10-01" (dates/date->iso (model/shown-month {} today false nil)))
+        "no date gives the month of today")))
+
+(deftest shown-month-keeps-the-month-of-an-open-panel-test
+  (let [cur (d "2026-03-01")]
+    (is (identical? cur (model/shown-month {:start-d (d "2025-05-01")} (d "2026-10-17") true cur)))))

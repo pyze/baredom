@@ -207,6 +207,18 @@
     (or (some? (:start-d canon)) (some? (:end-d canon)))
     (some? (:value-d canon))))
 
+(defn month-anchor
+  "The date the calendar opens on: the value, else the start, else the end, else `today`."
+  [canon today]
+  (or (:value-d canon) (:start-d canon) (:end-d canon) today))
+
+(defn shown-month
+  "The first day of the month to show. An open panel keeps `cur-month`, the month it shows."
+  [canon today open? cur-month]
+  (if (and open? cur-month)
+    cur-month
+    (dates/start-of-month (month-anchor canon today))))
+
 (defn write-display?
   "True when the input gets `text`: it has no focus, or `text` differs from `written`,
   the text last written."
