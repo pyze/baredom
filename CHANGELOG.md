@@ -16,6 +16,10 @@ All notable changes to BareDOM will be documented in this file.
   calendar opened on the wrong day, and on the last day of a month on the next month. Early in
   the morning in a time zone ahead of UTC, today was yesterday. This changes the default month,
   the focused day and the `x-calendar` today marker. Stored ISO dates do not change.
+- **The `x-date-picker` trigger button shows an SVG calendar icon** in place of the 📅 emoji.
+  The emoji rendered as a colour picture on each platform (on macOS a page that shows "JUL 17")
+  and ignored the theme colours. The icon is drawn in `currentColor`, scales with
+  `--x-font-size-sm`, and is `aria-hidden`. The button label stays "Open calendar".
 
 ## [4.8.0] - 2026-10-17
 
